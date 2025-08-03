@@ -69,10 +69,11 @@ apply_frr3 <- function(x, hash_base) {
 
 
 # Write data into an Excel file with disclaimer and "S" for suppressed
-write_release <- function(x, release_fn, template_fn, overwrite = FALSE) {
+write_release <- function(x, seg_cols, release_fn, template_fn, overwrite = FALSE) {
     message("Creating output release file '", release_fn, "'...")
     wb <- loadWorkbook(template_fn)
-    writeData(wb, "Data", x, keepNA = TRUE, na.string = "S")
+    x <- x %>% mutate(across(all_of(seg_cols), ~ replace_na(., "MISSING"))) # Put in placeholders for segmentation columns
+    writeData(wb, "Data", x, keepNA = TRUE, na.string = "S") # All other NAs will be filled with "S" for suppressed
     saveWorkbook(wb, release_fn, overwrite)
 }
 

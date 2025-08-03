@@ -28,9 +28,8 @@ output_raw <-
 output_frr3 <-
     output_raw %>%
     mutate(
-        across(all_of(seg_cols), ~ replace_na(., "MISSING")), # Put in placeholders for segmentation columns
-        # All counts columns are IDI unweighted counts, so...
         hash_base = make_hash_base(., seg_cols, hash_salt), # Create base hash string
+        # All counts columns are IDI unweighted counts, so...
         across(all_of(val_cols), ~ apply_suppression(., threshold = 6)), # ...suppress counts under 6
         across(all_of(val_cols), ~ apply_frr3(., hash_base))) %>% # ...and apply RR3
     select(-hash_base)
@@ -38,6 +37,7 @@ output_frr3 <-
 write_csv(output_raw, "outputs/summary_20250630_raw.csv")
 write_release(
     output_frr3,
+    seg_cols,
     "docs/output_template.xlsx",
     "outputs/summary_20250630_FOR_RELEASE.xlsx")
 ```
