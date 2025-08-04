@@ -37,8 +37,8 @@ apply_suppression <- function(x, threshold = 6) {
 # adding entropy.
 make_hash_base <- function(x, seg_cols, hash_salt) {
     out <-
-        x[seg_cols] %>%
-        apply(1, function(y) paste(c(hash_salt, y), collapse = ":"))
+        unite(x[seg_cols], "hb")[[1]] %>%
+        paste(hash_salt, .)
 
     return(out)
 }
