@@ -25,6 +25,49 @@ db_connect <- function(db_ref) {
 }
 
 
+# Write file and store run information
+store_output <- function(x, name, format = "parquet") {
+    if (format == "parquet") write_fn <- arrow::write_parquet
+    else if (format == "rds") write_fn <- write_rds
+    else if (format == "csv") write_fn <- write_csv
+    else stop("I don't know how to write '", format, "'!")
+
+    # Create log entry
+    curr <- tibble(
+        name = name,
+        fn = file.path("temp", paste0(name, ".", format)), 
+        rows = nrow(x),
+        hash = digest::digest(x),
+        last_changed = Sys.time())
+
+    # Load previous run
+    if (file.exists("run_log.csv")) {
+        run_log <- read_csv("run_log.csv", show_col_types = FALSE)
+    } else {
+        run_log <- curr[0,]
+    }
+
+    # Check against previous run
+    prev <- run_log[run_log$name == name,]
+    if (nrow(prev) == 0) {
+        has_changed <- TRUE
+        run_log <- bind_rows(run_log, curr[c("name")]) # Add placeholder row
+    } else {
+        comp_cols <- c("fn", "rows", "hash")
+        has_changed <- any(prev[comp_cols] != curr[comp_cols])
+    }
+
+    # Write if changed
+    if (has_changed) {
+        message("Saving as '", curr$fn, "'...")
+        run_log[run_log$name == name,] <- curr
+        write_csv(run_log, "run_log.csv") # Update run_log
+        write_fn(x, curr$fn)
+    }
+    else message("Unchanged from previous run.")
+}
+
+
 # Suppress values under 6
 apply_suppression <- function(x, threshold = 6) {
     out <- ifelse(x < threshold, NA, x)
