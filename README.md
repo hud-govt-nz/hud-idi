@@ -1,9 +1,34 @@
 # hud-idi
 Handy library of tools to being into the IDI. See [hud-govt-nz/social-housing-gap](https://github.com/hud-govt-nz/social-housing-gap) for an example of how it's used.
 
-Send `code/hud_idi.R` and `docs/output_template.xlsx` to `Access2Microdata-SharedMailbox@stats.govt.nz` and ask them to load it into your project.
+There might already be a copy of this project inside your IDI project. If not, ask `Access2Microdata-SharedMailbox@stats.govt.nz` to load it into your project (see "Managing Github repos" below).
 
 Of the output rules, only "suppress counts under 6" and "round randomly to a base of 3" have been implemented. Feel free to add to this with column-wise functions.
+
+
+## Managing Github repos
+Version control inside the IDI is tricky, since commits can't be pushed/pulled from inside the IDI. We can get around this by using `git bundle`, which bundles commits into a single file, which can then be put in (by asking `Access2Microdata-SharedMailbox@stats.govt.nz`) or pulled out (via the output process).
+
+For the initial bundle, you'll need to bundle everything:
+```
+git bundle create project_name.bundle -all
+```
+
+Request for the bundle file to be put into the IDI, and then from inside the IDI, run:
+```
+git clone project_name.bundle
+```
+
+To update projects once they've been created, you'll want to bundle commits with:
+```
+git log --oneline # Check which commits you want to bundle
+git bundle create project_name_20250801.bundle 5182737..HEAD # Replace 5182737 with the actual commit ID
+```
+
+And the from inside the IDI run:
+```
+git pull project_name_20250801.bundle
+```
 
 
 ## Generating outputs
