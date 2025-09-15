@@ -14,18 +14,18 @@ For the initial bundle, you'll need to bundle everything:
 git bundle create project_name.bundle -all
 ```
 
-Request for the bundle file to be put into the IDI, and then from inside the IDI, run:
+Request for the bundle file to be put into the IDI, and then from inside the IDI, create an empty Git project, go into it and run:
 ```
-git clone project_name.bundle
+git pull project_name.bundle
 ```
 
-To update projects once they've been created, you'll want to bundle commits with:
+To update projects once they've been created, you'll want to bundle all the commits that are new:
 ```
-git log --oneline # Check which commits you want to bundle
+git log --oneline # Find the last old commit e.g. 5182737
 git bundle create project_name_20250801.bundle 5182737..HEAD # Replace 5182737 with the actual commit ID
 ```
 
-And the from inside the IDI run:
+Once you get the bundle file to the other side, run:
 ```
 git pull project_name_20250801.bundle
 ```
