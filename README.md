@@ -9,25 +9,40 @@ Of the output rules, only "suppress counts under 6" and "round randomly to a bas
 ## Managing Github repos
 Version control inside the IDI is tricky, since commits can't be pushed/pulled from inside the IDI. We can get around this by using `git bundle`, which bundles commits into a single file, which can then be put in (by asking `Access2Microdata-SharedMailbox@stats.govt.nz`) or pulled out (via the output process).
 
+### Getting code into the IDI for the first time
 For the initial bundle, you'll need to bundle everything:
 ```
 git bundle create project_name.bundle -all
 ```
-
-Request for the bundle file to be put into the IDI, and then from inside the IDI, create an empty Git project, go into it and run:
+Request for the bundle file to be put into the IDI, and then from inside the IDI, create an empty Git project, go into the folder and run:
 ```
 git pull project_name.bundle
 ```
 
-To update projects once they've been created, you'll want to bundle all the commits that are new:
+### Getting code into the IDI afterwards
+For subsequent updates, only bundle from the last commit which went into the IDI to `HEAD`:
 ```
-git log --oneline # Find the last old commit e.g. 5182737
+git log --oneline # Find the last commit that exists in the IDI
 git bundle create project_name_20250801.bundle 5182737..HEAD # Replace 5182737 with the actual commit ID
+```
+
+Request for the bundle file to be put into the IDI, and then from inside the project folder in the IDI, run:
+```
+git pull project_name_20250801.bundle
+```
+
+### Getting code out of the IDI
+The process will work in reverse for getting code out of the IDI, except we'll need to provide a text file with the code changes for the output checking process.
+```
+git log --oneline # Find the last commit that exists on Github (i.e. out of the IDI)
+git bundle create project_name_20250807.bundle 7c2ae91..HEAD # Replace 7c2ae91 with the actual commit ID
+git diff 7c2ae91..HEAD >project_name_20250807.txt # Replace 7c2ae91 with the actual commit ID
 ```
 
 Once you get the bundle file to the other side, run:
 ```
-git pull project_name_20250801.bundle
+git pull project_name_20250807.bundle
+git push
 ```
 
 
